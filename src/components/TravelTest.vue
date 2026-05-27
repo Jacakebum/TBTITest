@@ -1,59 +1,180 @@
 <script setup>
-import { reactive, ref, computed } from "vue"
+import { reactive, ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { saveTbtiRecord } from './api/tbti';
+import { saveTbtiRecord } from './api/tbti'
 
-const router = useRouter() // 引入路由实例
+const router = useRouter()
 
 const questions = [
-  "到新城市，我更喜欢主动和当地人聊天。",
-  "我很容易在旅途中认识新朋友。",
-  "旅行结束后，我喜欢分享照片和故事给别人。",
-  "我喜欢参加当地的节庆、市集、活动。",
-  "我喜欢刺激的项目。",
-  "我愿意为了看到震撼风景而接受较大的体力消耗。",
-  "我认为的旅行对我来说是放松充电。",
-  "如果吸引我的打卡地点很多，我会精心筛选，而不是特种兵行程。",
-  "我乐意去有讲解类的文化圣地旅游。",
-  "如果旅游去传统人文类景区，我会提前了解该地的历史背景。",
-  "我善于在旅途中获取知识。",
-  "原生态环境比商业化景区更有吸引力。",
-  "相比热门景区，我更愿意尝试小众目的地。",
-  "我愿意为了体验去排队、凑热闹。",
-  "我会带上亲友一起旅行。"
+  { text: '到新城市，我更喜欢主动和当地人聊天。', dimension: 'energy', reverse: false },
+  { text: '我很容易在旅途中认识新朋友。', dimension: 'energy', reverse: false },
+  { text: '旅行结束后，我喜欢分享照片和故事给他人。', dimension: 'energy', reverse: false },
+  { text: '我会带上亲友一起旅行。', dimension: 'energy', reverse: false },
+  { text: '旅途中遇到节日庆典，我会立刻被欢笑声和音乐吸引，想要加入其中。', dimension: 'energy', reverse: false },
+  { text: '在酒店的公共区域，我会主动和其他旅行者搭话。', dimension: 'energy', reverse: false },
+  { text: '我认为旅行的意义之一就是结识来自不同地方的人。', dimension: 'energy', reverse: false },
+  { text: '我喜欢在旅行中当朋友/家人的“向导”和“组织者”。', dimension: 'energy', reverse: false },
+  { text: '旅行中，我更享受一个人的安静时光，而不是和别人聊天。', dimension: 'energy', reverse: true },
+  { text: '对我来说，旅途中与陌生人社交是一件消耗精力的事。', dimension: 'energy', reverse: true },
+  { text: '在社交平台上分享旅行动态让我感到压力或不自在。', dimension: 'energy', reverse: true },
+  { text: '如果可以选择，我更愿意独自完成整个旅行，不与他人交流。', dimension: 'energy', reverse: true },
+  { text: '旅行中即使遇到有趣的人，我通常不会主动留联系方式。', dimension: 'energy', reverse: true },
+  { text: '团队旅行（如跟团游、集体活动）让我觉得拘束，不如一个人自由。', dimension: 'energy', reverse: true },
+  { text: '在旅游大巴或拼车途中，我宁愿睡觉或看风景，也不愿和邻座聊天。', dimension: 'energy', reverse: true },
+
+  { text: '我喜欢刺激的项目（如过山车、蹦极、跳伞等）。', dimension: 'behavior', reverse: false },
+  { text: '我愿意为了看到震撼风景而接受较大的体力消耗（如长时间徒步、爬山）。', dimension: 'behavior', reverse: false },
+  { text: '相比较没去过的城市，我更想去我熟悉的地方游玩，这让我更安心。', dimension: 'behavior', reverse: true },
+  { text: '旅行中，我更倾向于选择设施完善、有明确指引的成熟路线。', dimension: 'behavior', reverse: true },
+  { text: '对我来说，旅行的核心是“松弛感”，我讨厌行程太满或太折腾。', dimension: 'behavior', reverse: true },
+  { text: '我会为了体验不一样的风景，选择未经开发的小众目的地。', dimension: 'behavior', reverse: false },
+  { text: '我喜欢尝试旅行中的新鲜活动，即使没有太多把握也没关系。', dimension: 'behavior', reverse: false },
+  { text: '出门旅游前，我会把交通、住宿、餐饮等行程费用提前规划好。', dimension: 'behavior', reverse: true },
+  { text: '在外旅游时，我更喜欢选择去过的、评价好的餐厅用餐。', dimension: 'behavior', reverse: true },
+  { text: '相比去异国文化差异大的地方，我更愿意在国内或文化接近的地方旅游。', dimension: 'behavior', reverse: true },
+  { text: '旅途中的意外和突发状况（如交通延误、天气突变）对我来说也是有趣体验。', dimension: 'behavior', reverse: false },
+  { text: '我会选择在旺季去热门景区，即使人多拥挤也没关系。', dimension: 'behavior', reverse: false },
+  { text: '对我来说，旅途中“按计划行事”比“自由发挥”更重要。', dimension: 'behavior', reverse: true },
+  { text: '出行前我会把每个景点的开放时间、门票价格都查清楚再出门。', dimension: 'behavior', reverse: true },
+  { text: '我更愿意选择熟悉的航空公司，即使票价稍贵。', dimension: 'behavior', reverse: true },
+
+  { text: '我旅行时不在意“有没有文化内涵”。', dimension: 'thirst', reverse: true },
+  { text: '相比感受大自然，我更重视知识获取。', dimension: 'thirst', reverse: false },
+  { text: '我喜欢去亲近自然的地方旅游。', dimension: 'thirst', reverse: true },
+  { text: '我乐意去有讲解服务的文化圣地旅游。', dimension: 'thirst', reverse: false },
+  { text: '相比逛博物馆，在大自然中散步更让我放松。', dimension: 'thirst', reverse: true },
+  { text: '我会提前了解景区历史背景。', dimension: 'thirst', reverse: false },
+  { text: '我喜欢在旅行中学习当地的历史和文化知识。', dimension: 'thirst', reverse: false },
+  { text: '旅行中，比起逛古建筑，我更喜欢欣赏自然风光。', dimension: 'thirst', reverse: true },
+  { text: '我觉得文化类景点（如博物馆、寺庙、遗址）比较枯燥。', dimension: 'thirst', reverse: true },
+  { text: '我会为了参观某处世界文化遗产而特意安排行程。', dimension: 'thirst', reverse: false },
+  { text: '阅读景区介绍牌或导览手册让我觉得麻烦。', dimension: 'thirst', reverse: true },
+  { text: '我喜欢在旅行中品尝当地特色美食、体验传统手工艺等文化活动。', dimension: 'thirst', reverse: false },
+  { text: '相比自然景区，有深厚历史背景的城市更吸引我。', dimension: 'thirst', reverse: false },
+  { text: '比起把大量时间留给自然风光，我更愿意把行程安排给博物馆、古城、遗址等人文景点。', dimension: 'thirst', reverse: false },
+  { text: '主题乐园比自然保护区的吸引力更大。', dimension: 'thirst', reverse: true },
+
+  { text: '旅游时看到喜欢的东西，我会毫不犹豫地买下。', dimension: 'indulgence', reverse: false },
+  { text: '在能够承受的范围内，我愿意花钱换取更好的旅行体验（如升级酒店房型、预订私人包车等）。', dimension: 'indulgence', reverse: false },
+  { text: '旅行前我会规划每日开销，避免超出预算。', dimension: 'indulgence', reverse: true },
+  { text: '即使是几块钱的差价，我也会比较几家店铺再决定购买。', dimension: 'indulgence', reverse: true },
+  { text: '旅游纪念品我会量力而行，不会因为“来都来了”就购买。', dimension: 'indulgence', reverse: true },
+  { text: '我会为了省钱而选择早出晚归的廉价航空。', dimension: 'indulgence', reverse: true },
+  { text: '在旅行中品尝当地高级餐厅的美食是值得的。', dimension: 'indulgence', reverse: false },
+  { text: '出行前我会把交通、住宿、餐饮等费用全部做一个预算表。', dimension: 'indulgence', reverse: true },
+  { text: '如果能节省时间，我愿意多花钱体验VIP免排队等服务。', dimension: 'indulgence', reverse: false },
+  { text: '在旅行中，能走路或坐公交就不会打车。', dimension: 'indulgence', reverse: true },
+  { text: '我会因为“价格太贵”而放弃体验某个旅行项目。', dimension: 'indulgence', reverse: true },
+  { text: '旅行期间我更喜欢自己做饭或带干粮，减少下馆子的花销。', dimension: 'indulgence', reverse: true },
+  { text: '为了在朋友圈晒出更精美的图片，我乐意付费入住高颜值酒店。', dimension: 'indulgence', reverse: false },
+  { text: '付款前我会仔细核对购物小票，防止多算钱。', dimension: 'indulgence', reverse: true },
+  { text: '我会选择价格低而非舒适度高的酒店。', dimension: 'indulgence', reverse: true }
 ]
 
 const options = [
-  { label: "非常不同意", score: 1, color: "#F26363" },
-  { label: "不同意", score: 2, color: "#F2994A" },
-  { label: "同意", score: 3, color: "#6FCF97" },
-  { label: "非常同意", score: 4, color: "#219653" }
+  { label: '非常不同意', score: -2, color: '#F26363' },
+  { label: '比较不同意', score: -1, color: '#F2994A' },
+  { label: '比较同意', score: 1, color: '#6FCF97' },
+  { label: '非常同意', score: 2, color: '#219653' }
 ]
 
-const currentIndex = ref(0)
-const answers = reactive(Array(15).fill(null))
-
-const progress = computed(() => {
-  return ((currentIndex.value) / questions.length) * 100
-})
-
-function nextQuestion() {
-  if (currentIndex.value < questions.length - 1) {
-    currentIndex.value++
-  } else {
-    calculate()
+const personalities = {
+  EAHP: {
+    name: '活力全开·多元探索型',
+    desc: '外向、爱冒险、求知欲强且消费大方。追求极致丰富性与品质体验，既要热闹社交又要文化沉淀，也要冒险征服和享乐度假。',
+    destination: '新加坡（滨海湾、环球影城、圣淘沙）；北京（长城、故宫、国贸天际线）'
+  },
+  EAHR: {
+    name: '精打细算·自主猎奇型',
+    desc: '热爱社交、冒险与文化探索，但消费克制。以“穷游”思维创造独特玩法，把有限经费集中在核心体验上。',
+    destination: '成都（宽窄巷子、青城山徒步、茶馆社交）'
+  },
+  EANP: {
+    name: '极致享乐·冒险家',
+    desc: '外向、追求极端刺激与户外挑战。消费优先选择高端冒险装备与奢华野外体验。',
+    destination: '皇后镇（新西兰）高空跳伞、喷射艇；瑞士阿尔卑斯山直升机滑雪'
+  },
+  EANR: {
+    name: '坚韧背包侠',
+    desc: '重视冒险体验本身，社交开朗但消费极度克制。享受“省钱”方式去冒险的成功感。',
+    destination: '四姑娘山（川西徒步露营）；菲律宾科隆（低成本跳岛潜水）'
+  },
+  EDHP: {
+    name: '高能社交·精控者',
+    desc: '擅长社交，注重文化内涵与历史探索。愿意为舒适交通、高级住宿、精致餐饮买单。',
+    destination: '京都（日本）古寺、日式民宿、怀石料理'
+  },
+  EDHR: {
+    name: '社交省钱规划师',
+    desc: '外向且善于照顾大家，文化求知欲强但预算理性。妙招连连，让团队旅行既省钱又快乐。',
+    destination: '台北（公共交通便利、故宫、夜市社交、平价住宿）'
+  },
+  EDNP: {
+    name: '稳中带奢·节奏大师',
+    desc: '热情外向却拒绝过度劳累，喜欢在社交氛围中享受自然美景，追求高端综合度假体验。',
+    destination: '马尔代夫（沙滩、水上别墅）；西双版纳（热带雨林、高端酒店）'
+  },
+  EDNR: {
+    name: '从容度假派',
+    desc: '外向但不喜欢自虐式旅游。在成熟自然景观中休闲，追求低成本但高质量的共同时光。',
+    destination: '海南三亚（平价公寓、公共沙滩）；朱家角古镇（水乡低成本休闲）'
+  },
+  IAHP: {
+    name: '独行鉴赏家',
+    desc: '内向喜独处，追求文化深度与冒险挑战，同时愿意为独一无二的定制体验花大价钱。',
+    destination: '乌兹别克斯坦（撒马尔罕、布哈拉）；敦煌（莫高窟、鸣沙山）'
+  },
+  IAHR: {
+    name: '知识苦行僧',
+    desc: '不爱社交，但对历史人文狂热。消费极俭，只为获得精神上的巨大满足感。',
+    destination: '黔东南（未商业化的侗寨苗寨，非遗文化）'
+  },
+  IANP: {
+    name: '纯粹高阶挑战者',
+    desc: '厌弃主流通用路线，追求隐秘自然秘境。将极限冒险视为精神修行，坚持高端户外品质。',
+    destination: '哥斯达黎加（私人自然保护区、雨林探险）；西藏墨脱（莲花秘境）'
+  },
+  IANR: {
+    name: '极限独行者',
+    desc: '极度内敛独立，几乎不花钱也能在险境中获得乐趣。风餐露宿，只为无人区美景。',
+    destination: '丙中洛-察瓦龙徒步线（进藏第八条路，低成本极致挑战）'
+  },
+  IDHP: {
+    name: '悠然鉴赏家',
+    desc: '内向的独行文化客，享受古寺禅修、传统文化，但追求安逸幽雅环境和品质住宿。',
+    destination: '成都青城山六善酒店（道家文化、高品质疗愈）'
+  },
+  IDHR: {
+    name: '知识背包客',
+    desc: '内向、踏实，用极低成本专注自学文史知识，实地考察古迹。带着笔记本在博物馆待一整天。',
+    destination: '山西南禅寺、佛光寺（低成本高密度古建研学）'
+  },
+  IDNP: {
+    name: '安静疗愈派',
+    desc: '沉静、避免冲突，在绝美安静的自然中“精神排毒”，选择高品质避世住宿。',
+    destination: '青城山坐忘森林酒店；松阳云端觅境（古村落高品质独处）'
+  },
+  IDNR: {
+    name: '极简独行隐士',
+    desc: '寡言、不善交际、消费极简。旅行只是换个便宜且宁静的地方继续生活。',
+    destination: '江浙沪免费郊野公园；洱海边平价客栈（自带茶饮干粮）'
   }
 }
+
+const currentIndex = ref(0)
+const answers = reactive(Array(questions.length).fill(null))
+const isSubmitting = ref(false)
+
+const progress = computed(() => ((currentIndex.value + 1) / questions.length) * 100)
 
 function prevQuestion() {
-  if (currentIndex.value > 0) {
-    currentIndex.value--
-  }
+  if (currentIndex.value > 0) currentIndex.value--
 }
 
-const selectAnswer = (score) => {
+function selectAnswer(score) {
+  if (isSubmitting.value) return
   answers[currentIndex.value] = score
-  
+
   setTimeout(() => {
     if (currentIndex.value < questions.length - 1) {
       currentIndex.value++
@@ -63,196 +184,97 @@ const selectAnswer = (score) => {
   }, 300)
 }
 
-/* ===== 16人格数据库 ===== */
-const personalities = {
-  ESFM:{
-    name:"快乐小狗ESFM",
-    desc:"热闹是我的充电宝，经典IP是我的快乐老家。我的旅行法则：来都来了，必须玩到闭园！",
-    spots:"迪士尼、珠海长隆海洋王国、东方明珠、双月湖、广州非遗夜宴"
-  },
-    ESHM:{
-    name:"网红ESHM",
-    desc:"一生要强的旅人，誓要踏遍所有5A。每一个知名地标，都是我人生的勋章。",
-    spots:"三峡之巅白帝城、黄山、灵隐寺、雍和宫、颐和园、兵马俑、重庆解放碑、清明上河园、故宫"
-  },
-  ESHN:{
-    name:"考古学家ESHN",
-    desc:"记忆深处是历史的天空，相册扉页是文明的切片。",
-    spots:"康家石门子、姜子牙钓鱼台、扎西半岛、浚县古城、乔家大院、竹安寨和九龙湖、怪臼谷、桂海晴岚、资源古木"
-  },
-   ESFN:{
-    name:"冒险家ESFN",
-    desc:"用身体丈量祖国大好河山。人活着就要折腾，坐得住算我输。",
-    spots:"禾木景区、茶马古道、鼓山、南普陀、黄岗山大峡谷、老君山、猫儿峰、观云海、望四姑娘山、十六沟景区"
-  },
-   ECHM:{
-    name:"教授ECHM",
-    desc:"漫步人文世界，洞察文化底色，与文明对视。",
-    spots:"故宫、国家自然博物馆、北京首都博物馆、兵马俑、白马寺、印象大红袍、颐和园"
-  },
-  ECHN:{
-    name:"作家ECHN",
-    desc:"总能发现世界的另一面。不拥不挤，在自己的赛道书写旅行的定义",
-    spots:"甲居藏寨、西江千户苗寨、清源山、丽水金沙、扎西半岛、三江程阳八寨"
-  },
-   ECFM:{
-    name:"主持人ECFM",
-    desc:"独乐乐不如众乐乐。一个人玩是快乐，一群人玩是极乐！",
-    spots:"迪士尼、珠海长隆海洋王国、珠海太空中心、橘子洲、东方明珠"
-  },
-   ECFN:{
-    name:"佛系者ECFN",
-    desc:"临时起意是旅行的常态~主打一个走到哪儿玩到哪儿",
-    spots:"郴州珍稀温泉山塘河、天鹅游湖、丽水金沙、东海森林、青海日月山"
-  },
-  ISHM:{
-    name:"孤勇者ISHM",
-    desc:"有些风景，需要安静地独自面对。人群是噪音，安静才是共鸣。",
-    spots:"兵马俑、三峡之巅白帝城、黄山、雍和宫、故宫、白马寺"
-  },
-   ISHN:{
-    name:"探索者ISHN",
-    desc:"你看不到的角落，藏着我的整个宇宙。",
-    spots:"扎西半岛、甲居藏寨、西江千户苗寨、康家石门子、西沙群岛、武功山、观云海"
-  },
-   ISFM:{
-    name:"剧本杀玩家ISFM",
-    desc:"我不看风景，我活在风景里。既是观众，也是角色",
-    spots:"重庆解放碑、广州非遗夜宴、东方明珠上海陈列馆"
-  },
-   ISFN:{
-    name:"野兽派ISFN",
-    desc:"就爱来点刺激的，旅行没有剧本，方向不必顺从。",
-    spots:"禾木景区、鸳鸯草场、双月湖、茶马古道、鼓山、黄岗山大峡谷、西岛海洋文化旅游区"
-  },
-   ICHM:{
-    name:"守护者ICHM",
-    desc:"时间沉淀出历史，旅行更像是穿越。",
-    spots:"故宫、雍和宫、国家自然博物馆、北京首都博物馆、颐和园、白马寺、印象大红袍"
-  },
-  ICHN:{
-    name:"隐士ICHN",
-    desc:"我喜欢的地方，还没学会商业化。",
-    spots:"棒槌山、三江程阳八寨、桂海晴岚、资源古木、浚县古城、乔家大院、竹安寨和九龙湖"
-  },
-  ICFM:{
-    name:"图书管理员ICFM",
-    desc:"不逐风，不赶浪，在自己的旅行节奏里，慢慢盛开。",
-    spots:"鼓浪屿、橘子洲、西岛海洋文化旅游区、南普陀、天鹅游湖、迪士尼"
-  },
-  
-  ICFN:{
-    name:"心理医生ICFN",
-    desc:"山水熨平心中的褶皱。",
-    spots:"问仙谷、蝴蝶谷、郴州珍稀温泉山塘河、东海森林、丽水金沙、青海日月山、黄果树、巫山小三峡、巫山奉节"
-  }
+function getScoredAnswer(answer, question) {
+  return question.reverse ? -answer : answer
 }
 
-/* ===== 计算人格 ===== */
-function calculate() {
-  let score = {
-    E:0, I:0,
-    S:0, C:0,
-    F:0, H:0,
-    N:0, M:0
+function sumDimension(scoredAnswers, dimension) {
+  return scoredAnswers.reduce((total, score, index) => {
+    return questions[index].dimension === dimension ? total + score : total
+  }, 0)
+}
+
+async function calculate() {
+  if (isSubmitting.value) return
+  if (answers.some(a => a === null)) return
+
+  isSubmitting.value = true
+
+  const rawAnswers = [...answers]
+  const scoredAnswers = rawAnswers.map((answer, index) => getScoredAnswer(answer, questions[index]))
+  const energy = sumDimension(scoredAnswers, 'energy')
+  const behavior = sumDimension(scoredAnswers, 'behavior')
+  const thirst = sumDimension(scoredAnswers, 'thirst')
+  const indulgence = sumDimension(scoredAnswers, 'indulgence')
+
+  const e_i = energy > 0 ? 'E' : 'I'
+  const a_d = behavior > 0 ? 'A' : 'D'
+  const h_n = thirst > 0 ? 'H' : 'N'
+  const p_r = indulgence > 0 ? 'P' : 'R'
+  const personalityType = e_i + a_d + h_n + p_r
+  const personality = personalities[personalityType] || {
+    name: '旅行人格生成中',
+    desc: '本次结果暂时没有匹配到完整说明，请返回重新测试。',
+    destination: '暂无推荐目的地。'
   }
 
-  // E I 维度（外向/内向）：第1-5题（索引0-3、14）
-  for(let i=0;i<=3;i++){
-    if(answers[i]>=3) score.E += answers[i]
-    else score.I += answers[i]
-  }
-  if(answers[14]>=3) score.E += answers[14]
-  else score.I += answers[14]
-
-  // S C 维度（刺激/休闲）：第6-8题（索引4-6）
-  if(answers[4]>=3) score.S += answers[4]
-  else score.C += answers[4]
-  if(answers[5]>=3) score.S += answers[5]
-  else score.C += answers[5]
-  if(answers[6]>=3) score.C += answers[6]
-  else score.S += answers[6]
-
-  // F H 维度（娱乐/文化）：第9-11题（索引7-10）
-  if(answers[7]>=3) score.C += answers[7]
-  else score.S += answers[7]
-  for(let i=8;i<=10;i++){
-    if(answers[i]>=3) score.H += answers[i]
-    else score.F += answers[i]
+  const result = {
+    code: personalityType,
+    type: personalityType,
+    ...personality
   }
 
-  // N M 维度（小众/主流）：第12-14题（索引11-13）
-  if(answers[11]>=3) score.N += answers[11]
-  else score.M += answers[11]
-  if(answers[12]>=3) score.N += answers[12]
-  else score.M += answers[12]
-  if(answers[13]>=3) score.M += answers[13]
-  else score.N += answers[13]
-
-  // 确定最终人格类型
-  const type =
-    (score.E >= score.I ? "E" : "I") +
-    (score.S >= score.C ? "S" : "C") +
-    (score.H >= score.F ? "H" : "F") +
-    (score.M >= score.N ? "M" : "N")
-
-   // 构造提交数据
   const submitData = {
-    answers: [...answers], // 转为普通数组
-    personalityType: type,
-  };
+    answers: rawAnswers,
+    scoredAnswers,
+    personalityType,
+    result,
+    meta: { energy, behavior, thirst, indulgence }
+  }
 
-  fetch('https://你的Render后端地址.onrender.com/api/save-tbti-record', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(submitData)
-  }).catch(err => console.debug('提交失败:', err));
+  try {
+    await saveTbtiRecord(submitData)
+  } catch (e) {
+    console.error('保存失败', e)
+  }
 
   router.push({
-    name: 'LoadingPage',  // 先跳转到loading页
-    query: { result: JSON.stringify(personalities[type]) }
+    name: 'LoadingPage',
+    query: { result: JSON.stringify(result) }
   })
 }
 </script>
 
 <template>
   <div>
-    <!-- 进度条 -->
     <div class="progress-bar">
       <div class="progress-inner" :style="{ width: progress + '%' }"></div>
     </div>
-    <p class="progress-text">{{currentIndex+1}} / 15</p>
+    <p class="progress-text">{{ currentIndex + 1 }} / {{ questions.length }}</p>
 
-    <!-- 当前问题 -->
     <div class="question-card">
-      <h3>{{ questions[currentIndex] }}</h3>
+      <h3>{{ questions[currentIndex].text }}</h3>
 
-      <!-- 选项容器：横向排列且无滚动条 -->
       <div class="options-container">
-        <button 
+        <button
           v-for="option in options"
           :key="option.score"
-          :class="{ active: answers[currentIndex] == option.score }"
-          :style="{ 
+          :class="{ active: answers[currentIndex] === option.score }"
+          :style="{
             borderColor: option.color,
-            color: answers[currentIndex] == option.score ? 'white' : option.color,
-            backgroundColor: answers[currentIndex] == option.score ? option.color : 'transparent'
+            color: answers[currentIndex] === option.score ? 'white' : option.color,
+            backgroundColor: answers[currentIndex] === option.score ? option.color : 'transparent'
           }"
           @click="selectAnswer(option.score)"
           class="option-btn"
+          :disabled="isSubmitting"
         >
-          <!-- 只保留文字，移除图标 -->
           <span class="option-label">{{ option.label }}</span>
         </button>
       </div>
 
       <div class="btn-group">
-        <!-- 上一题按钮：仅在2-15题显示（currentIndex >=1） -->
-        <button
-          v-if="currentIndex >= 1"
-          class="prev-btn"
-          @click="prevQuestion"
-        >
+        <button v-if="currentIndex >= 1" class="prev-btn" @click="prevQuestion" :disabled="isSubmitting">
           上一题
         </button>
       </div>
@@ -260,154 +282,145 @@ function calculate() {
   </div>
 </template>
 
-<script>
-import { saveTbtiRecord } from './api/tbti'; // 引入封装的接口
-
-export default {
-  data() {
-    return {
-      testCompleted: false,
-      answers: [], // 存储用户所有回答
-      personalityType: '' // 最终人格类型
-    };
-  },
-  methods: {
-    // 测试完成后调用，生成人格类型并自动提交数据
-    finishTest() {
-      // 1. 原有生成人格类型的逻辑
-      this.personalityType = 'INTJ'; // 替换为你的实际生成逻辑
-      this.testCompleted = true;
-
-      this.submitTestDataSilently();
-    },
-
-    async submitTestDataSilently() {
-      try {
-        // 构造提交的数据
-        const submitData = {
-          answers: this.answers, // 你的回答数组
-          personalityType: this.personalityType
-        };
-
-        // 调用后端接口，仅执行，不处理成功/失败的可视化提示
-        await saveTbtiRecord(submitData);
-        
-        // 移除所有alert/console.log，完全静默
-        // 即使失败也不提示用户，仅在后端控制台打印（方便你排查问题）
-      } catch (error) {
-        // 仅在后端控制台输出错误，前端无任何提示
-        console.error('数据提交失败（仅开发者可见）：', error);
-      }
-    }
-  }
-};
-</script>
-
 <style scoped>
-.progress-bar {
-  height: 10px;
-  background: #eee;
-  border-radius: 5px;
-  margin: 20px 0;
+:global(body) {
+  background: #f5f6f8;
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", sans-serif;
+  color: #111827;
 }
+
+.progress-bar {
+  width: 100%;
+  height: 12px;
+  background: #e9edf3;
+  border-radius: 999px;
+  overflow: hidden;
+  margin: 12px 0 18px;
+}
+
 .progress-inner {
   height: 100%;
-  background: #4CAF50;
-  border-radius: 5px;
-  transition: width 0.3s ease;
+  background: linear-gradient(90deg, #7cc7ff, #4a90e2);
+  border-radius: 999px;
+  transition: width 0.25s ease;
 }
+
 .progress-text {
   text-align: right;
-  margin-bottom: 20px;
+  font-size: 15px;
+  color: #6b7280;
+  margin-bottom: 14px;
 }
+
 .question-card {
-  background: #fff;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-  width: 100%;
-  box-sizing: border-box; /* 包含内边距计算宽度 */
+  background: #ffffff;
+  border-radius: 24px;
+  padding: 28px 22px 22px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
 }
 
-/* 核心修改：选项容器 - 无滚动条，强制适配宽度 */
+.question-card h3 {
+  font-size: 30px;
+  line-height: 1.45;
+  font-weight: 800;
+  margin-bottom: 28px;
+  color: #111827;
+}
+
 .options-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 5px; /* 缩小间距避免溢出 */
-  margin: 20px 0;
-  width: 100%;
-  box-sizing: border-box;
-  /* 移除滚动条相关样式 */
-  overflow: visible;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
 }
 
-/* 选项按钮样式调整 - 适配宽度无溢出 */
 .option-btn {
-  flex: 1; /* 等分宽度 */
-  padding: 15px 5px;
-  border: 2px solid #ddd;
+  min-height: 86px;
+  border: 4px solid;
+  border-radius: 20px;
   background: #fff;
-  border-radius: 8px;
+  font-size: 18px;
+  font-weight: 700;
   cursor: pointer;
   transition: all 0.2s ease;
+  padding: 0 14px;
+}
+
+.option-btn:hover {
+  transform: translateY(-1px);
+}
+
+.option-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.option-label {
+  display: inline-block;
+  line-height: 1.3;
+}
+
+.btn-group {
+  margin-top: 24px;
   display: flex;
-  justify-content: center; /* 文字居中 */
-  align-items: center;
-  font-size: 14px;
-  box-sizing: border-box;
-  /* 强制适配，不换行 */
-  white-space: nowrap;
-  text-align: center;
-}
-
-.option-btn.active {
-  transform: scale(1.02); /* 选中时轻微放大 */
-}
-
-/* 适配小屏幕 - 缩小字体和内边距，避免溢出 */
-@media (max-width: 768px) {
-  .option-btn {
-    font-size: 12px;
-    padding: 12px 3px;
-  }
-}
-
-/* 适配超小屏幕 */
-@media (max-width: 480px) {
-  .option-btn {
-    font-size: 11px;
-    padding: 10px 2px;
-  }
-  .options-container {
-    gap: 3px;
-  }
+  justify-content: flex-start;
 }
 
 .prev-btn {
-  padding: 10px 20px;
-  border: 1px solid #ddd;
-  background: #fff;
-  border-radius: 8px;
-  cursor: pointer;
-  margin-right: 10px;
-}
-.next-btn {
-  padding: 10px 20px;
-  background: #4CAF50;
-  color: white;
   border: none;
-  border-radius: 8px;
+  background: #eef2f7;
+  color: #374151;
+  border-radius: 14px;
+  padding: 12px 18px;
+  font-size: 15px;
+  font-weight: 700;
   cursor: pointer;
-  font-size: 16px;
 }
-.next-btn:hover {
-  background: #45a049;
+
+.prev-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
-.btn-group {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 20px;
+
+@media (max-width: 768px) {
+  .question-card {
+    border-radius: 18px;
+    padding: 20px 16px 18px;
+  }
+
+  .question-card h3 {
+    font-size: 22px;
+    margin-bottom: 20px;
+  }
+
+  .options-container {
+    gap: 12px;
+  }
+
+  .option-btn {
+    min-height: 74px;
+    font-size: 16px;
+    border-width: 3px;
+    border-radius: 16px;
+  }
+
+  .progress-text {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .options-container {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .question-card h3 {
+    font-size: 18px;
+  }
+
+  .option-btn {
+    min-height: 64px;
+    font-size: 14px;
+    padding: 0 8px;
+  }
 }
 </style>

@@ -1,8 +1,8 @@
 <script setup>
 import { useRouter } from 'vue-router'
+
 const router = useRouter()
 
-// 点击“开始测试”跳转到答题页
 function startTest() {
   router.push({ name: 'TravelTest' })
 }
@@ -12,15 +12,22 @@ function startTest() {
   <div class="start-card">
     <div class="start-header">
       <h1>✨ TBTI旅行人格测试 ✨</h1>
-      <p class="sub-title">免费TBTI测试,3分钟发现你的16型旅行者人格,
-        获取详细性格分析, 生成专属人格旅行攻略。
-        开启你的旅行探索之旅吧~</p>
+      <p class="sub-title">
+        通过60道旅行偏好题，从旅行能量、行为偏好、求知倾向和消费风格四个维度了解你。
+        测试会生成16种旅行人格之一，并给出你的旅行行为特征和目的地推荐。
+      </p>
+    </div>
+
+    <div class="dimension-list">
+      <p><strong>旅行能量：</strong>看你更享受热闹社交，还是偏爱安静独处。</p>
+      <p><strong>行为偏好：</strong>看你更喜欢冒险探索，还是更重视稳定舒适。</p>
+      <p><strong>求知倾向：</strong>看你更被历史文化吸引，还是更亲近自然体验。</p>
+      <p><strong>消费风格：</strong>看你愿意为体验投入，还是更习惯理性节制。</p>
     </div>
 
     <div class="start-img">
-      <!-- 小红书风格占位图，可替换为实际旅行插画 -->
       <div class="img-placeholder">
-        <span>🌍</span>
+        <span>🧳</span>
       </div>
     </div>
 
@@ -56,8 +63,33 @@ function startTest() {
 
 .sub-title {
   font-size: 14px;
-  color: #888;
-  margin: 0 0 25px;
+  line-height: 1.7;
+  color: #666;
+  margin: 0 0 18px;
+}
+
+.dimension-list {
+  text-align: left;
+  background: #fff7f9;
+  border: 1px solid #ffebf0;
+  border-radius: 18px;
+  padding: 14px 16px;
+  margin: 0 0 24px;
+}
+
+.dimension-list p {
+  font-size: 13px;
+  line-height: 1.6;
+  color: #555;
+  margin: 0 0 8px;
+}
+
+.dimension-list p:last-child {
+  margin-bottom: 0;
+}
+
+.dimension-list strong {
+  color: #ff4d6d;
 }
 
 .img-placeholder {

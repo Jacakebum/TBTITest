@@ -1,42 +1,55 @@
 <script setup>
-import { useRouter } from 'vue-router'
-const router = useRouter()
+import { computed } from 'vue'
+import { useRoute } from 'vue-router'
 
-// 接收路由传递的结果参数
-const props = defineProps({
-  result: {
-    type: Object,
-    required: true,
-    default: () => ({})
+const route = useRoute()
+
+function parseResultQuery(value) {
+  if (!value) return {}
+  const rawValue = Array.isArray(value) ? value[0] : value
+
+  try {
+    return JSON.parse(rawValue)
+  } catch (e) {
+    try {
+      return JSON.parse(decodeURIComponent(rawValue))
+    } catch (decodeError) {
+      console.error('结果页解析失败', decodeError)
+      return {}
+    }
   }
-})
+}
 
+const result = computed(() => {
+  return parseResultQuery(route.query.result)
+})
 </script>
 
 <template>
   <div class="result-card">
     <div class="result-header">
-      <h1>✨ 你的旅行人格是 ✨</h1>
+      <h1>你的旅行人格是</h1>
     </div>
 
-    <!-- 人格名称（突出展示） -->
-    <h2 class="personality-name">{{ result.name }}</h2>
+    <div class="code-badge">{{ result.code || result.type || '--' }}</div>
+    <h2 class="personality-name">{{ result.name || '结果生成中' }}</h2>
 
-    <!-- 人格描述 -->
-    <p class="desc">{{ result.desc }}</p>
+    <section class="feature-box">
+      <h3>旅行行为特征</h3>
+      <p>{{ result.desc || '暂时没有读取到结果，请返回重试。' }}</p>
+    </section>
+
+    <section class="destination-box">
+      <h3>目的地推荐</h3>
+      <p>{{ result.destination || '暂无推荐目的地。' }}</p>
+    </section>
 
     <div class="tag">#TBTI旅行人格</div>
-
-    <!-- 推荐体验标题 -->
-    <h3>💫 推荐体验</h3>
-    <div class="spots-card">
-      <p class="spots">{{ result.spots }}</p>
-    </div>
   </div>
 </template>
 
 <style scoped>
-:deep(body) {
+:global(body) {
   background: #f7f7f7;
   font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", sans-serif;
 }
@@ -48,66 +61,97 @@ const props = defineProps({
   padding: 35px 25px;
   border-radius: 25px;
   text-align: center;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
 }
 
-/* 头部标题 */
 .result-header h1 {
   font-size: 16px;
   color: #666;
   margin: 0 0 15px;
-  font-weight: normal;
+  font-weight: 400;
 }
 
-/* 人格名称（核心视觉） */
-.personality-name {
-  font-size: 28px;
-  margin: 10px 0 20px;
-  color: #ff4d6d; /* 小红书标志性粉色 */
-  font-weight: bold;
+.code-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 78px;
+  height: 36px;
+  padding: 0 16px;
+  border-radius: 999px;
+  background: #ffebf0;
+  color: #ff4d6d;
+  font-size: 18px;
+  font-weight: 800;
   letter-spacing: 1px;
 }
 
-/* 描述文本 */
-.desc {
-  font-size: 16px;
-  color: #333;
-  line-height: 1.6;
-  margin: 0 0 15px;
-  padding: 0 10px;
+.personality-name {
+  font-size: 28px;
+  margin: 14px 0 22px;
+  color: #ff4d6d;
+  font-weight: 700;
+  letter-spacing: 1px;
 }
 
-/* 小红书风格标签 */
+.feature-box,
+.destination-box {
+  text-align: left;
+  border-radius: 16px;
+  padding: 16px 18px;
+  margin: 14px 0;
+}
+
+.feature-box {
+  border: 1px solid #d1d5db;
+  background: #fafafa;
+}
+
+.destination-box {
+  border: 1px solid #ffd6df;
+  background: #fff7f9;
+}
+
+.feature-box h3,
+.destination-box h3 {
+  font-size: 15px;
+  color: #666;
+  margin: 0 0 8px;
+  font-weight: 700;
+}
+
+.feature-box p,
+.destination-box p {
+  font-size: 16px;
+  color: #333;
+  line-height: 1.7;
+  margin: 0;
+}
+
 .tag {
-  background: #ffebf0; /* 浅粉底色 */
+  background: #ffebf0;
   color: #ff4d6d;
   display: inline-block;
   padding: 6px 18px;
   border-radius: 20px;
-  margin: 15px 0 25px;
+  margin: 18px 0 0;
   font-size: 14px;
 }
 
-/* 推荐体验标题 */
-.result-card h3 {
-  color: #333;
-  margin: 0 0 15px;
-  font-size: 16px;
-}
+@media (max-width: 480px) {
+  .result-card {
+    margin: 16px auto;
+    padding: 28px 20px;
+    border-radius: 22px;
+  }
 
-/* 推荐地点卡片 */
-.spots-card {
-  background: #f9f9f9;
-  border-radius: 18px;
-  padding: 15px;
-  margin: 0 0 25px;
-}
+  .personality-name {
+    font-size: 24px;
+  }
 
-.spots {
-  color: #666;
-  font-size: 15px;
-  line-height: 1.8;
-  margin: 0;
+  .feature-box p,
+  .destination-box p {
+    font-size: 15px;
+  }
 }
-
 </style>

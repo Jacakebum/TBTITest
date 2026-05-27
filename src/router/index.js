@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import StartPage from '../components/StartPage.vue'       // 新增
-import LoadingPage from '../components/LoadingPage.vue'   // 新增
+import StartPage from '../components/StartPage.vue'      
+import LoadingPage from '../components/LoadingPage.vue'  
 import TravelTest from '../components/TravelTest.vue'
 import ResultPage from '../components/ResultPage.vue'
 
@@ -23,8 +23,7 @@ const routes = [
   {
     path: '/result',
     name: 'ResultPage',
-    component: ResultPage,
-    props: route => ({ result: JSON.parse(route.query.result || '{}') })
+    component: ResultPage
   }
 ]
 

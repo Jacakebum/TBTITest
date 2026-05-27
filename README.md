@@ -1,44 +1,36 @@
-# tbti-test
+# TBTI 旅行人格测试
 
-This template should help get you started developing with Vue 3 in Vite.
+TBTI 是一个面向旅行偏好的心理测试网站。新版测试包含 60 道题，会从 4 个维度分析用户的旅行偏好，并生成 16 种旅行人格之一。
 
-## Recommended IDE Setup
+## 测试维度
 
-[VS Code](https://code.visualstudio.com/) + [Vue (Official)](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+- 旅行能量：判断用户更享受热闹社交，还是更偏爱安静独处。
+- 行为偏好：判断用户更喜欢冒险探索，还是更重视稳定、舒适和可控。
+- 求知倾向：判断用户更容易被历史文化、知识内容吸引，还是更亲近自然体验。
+- 消费风格：判断用户更愿意为旅行体验投入预算，还是更习惯理性规划和节制消费。
 
-## Recommended Browser Setup
+## 结果说明
 
-- Chromium-based browsers (Chrome, Edge, Brave, etc.):
-  - [Vue.js devtools](https://chromewebstore.google.com/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd)
-  - [Turn on Custom Object Formatter in Chrome DevTools](http://bit.ly/object-formatters)
-- Firefox:
-  - [Vue.js devtools](https://addons.mozilla.org/en-US/firefox/addon/vue-js-devtools/)
-  - [Turn on Custom Object Formatter in Firefox DevTools](https://fxdx.dev/firefox-devtools-custom-object-formatters/)
+测试结果由 4 个字母组成，例如 `EAHP`。每个字母代表一个维度上的倾向，组合后对应 16 种旅行人格。结果页会展示人格代号、人格类型、旅行行为特征和目的地推荐。
 
-## Customize configuration
+## 项目结构
 
-See [Vite Configuration Reference](https://vite.dev/config/).
+- `src/`：Vue 前端页面和测试逻辑。
+- `tbti-backend/`：Express 后端接口，负责保存测试记录和导出 Excel。
 
-## Project Setup
+## 本地运行
 
-```sh
+前端：
+
+```bash
 npm install
-```
-
-### Compile and Hot-Reload for Development
-
-```sh
 npm run dev
 ```
 
-### Compile and Minify for Production
+后端：
 
-```sh
-npm run build
-```
-
-### Lint with [ESLint](https://eslint.org/)
-
-```sh
-npm run lint
+```bash
+cd tbti-backend
+npm install
+npm start
 ```
